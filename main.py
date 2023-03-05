@@ -44,21 +44,60 @@ def pad(x,y):
     return x,y
 
 
-
 def subquadratic_multiply(x, y):
+  return _subquadratic_multiply(x, y).decimal_val
+
+def _subquadratic_multiply(x, y):
+  xvec = x.binary_vec
+  yvec = y.binary_vec
+
+  if x.decimal_val <= 1 and y.decimal_val <= 1:
+    return BinaryNumber(x.decimal_val*y.decimal_val)
+
+  
+  xvec, yvec = pad(xvec, yvec)
+  n = len(xvec)
+  x_left, x_right = split_number(xvec)
+  y_left, y_right = split_number(yvec)
+    
+  ans1 = _subquadratic_multiply(x_left, y_left)
+  ans2 = _subquadratic_multiply(x_right, y_right)
+  ans3 = _subquadratic_multiply(BinaryNumber(x_left.decimal_val + x_right.decimal_val), BinaryNumber(y_left.decimal_val + y_right.decimal_val)).decimal_val
+  ans3 = BinaryNumber(ans3 - ans1.decimal_val - ans2.decimal_val)
+  ans3 = bit_shift(ans3, n//2)
+  ans1 = bit_shift(ans1, n)
+  
+  return BinaryNumber(ans1.decimal_val + ans2.decimal_val + ans3.decimal_val)
+    
+    
+  
     ### TODO
-    pass
+  
     ###
 
 ## Feel free to add your own tests here.
 def test_multiply():
     assert subquadratic_multiply(BinaryNumber(2), BinaryNumber(2)) == 2*2
+    assert subquadratic_multiply(BinaryNumber(4), BinaryNumber(3)) == 4*3
+    assert subquadratic_multiply(BinaryNumber(13), BinaryNumber(12)) == 13*12
+
+
+
 
 def time_multiply(x, y, f):
     start = time.time()
     # multiply two numbers x, y using function f
     return (time.time() - start)*1000
 
+print(time_multiply(2,2,subquadratic_multiply(BinaryNumber(2), BinaryNumber(2))))    
+
+print(time_multiply(2,2,subquadratic_multiply(BinaryNumber(100), BinaryNumber(200))))    
+
+print(time_multiply(2,2,subquadratic_multiply(BinaryNumber(10000), BinaryNumber(20000)))) 
+
+print(time_multiply(2,2,subquadratic_multiply(BinaryNumber(1000000), BinaryNumber(50))))    
+
+    
     
     
 
